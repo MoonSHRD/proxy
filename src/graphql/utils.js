@@ -67,14 +67,18 @@ export const stopCachedMatrixClient = client => {
   }
 };
 
-export const makeMatrixSubscribe = (event, filter) => (args, context) => ({
+const identity = x => x;
+
+export const makeMatrixSubscribe = (event, transform = identity) => (args, context) => ({
   next() {
     return context.matrixClient.then(
       client =>
         new Promise(resolve => {
-          client.on('Room.timeline', e => {
-            if (filter(e, args, context)) {
-              resolve({ value: { event: camelizeKeys(e.event) }, done: false });
+          client.on(event, e => {
+            const value = camelizeKeys(transform(e, args, context));
+
+            if (value) {
+              resolve({ value, done: false });
             }
           });
         })

@@ -15,7 +15,13 @@ const newRoomMessage = subscriptionWithClientId({
       type: new GraphQLNonNull(RoomMessage),
     },
   },
-  subscribe: makeMatrixSubscribe('Room.timeline', e => e.getType() === 'm.room.message'),
+  subscribe: makeMatrixSubscribe('Room.timeline', ({ event }, args) => {
+    if (event.type !== 'm.room.message' || event.room_id !== args.roomId) {
+      return null;
+    }
+
+    return { event };
+  }),
 });
 
 export default new GraphQLObjectType({
