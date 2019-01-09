@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLString } from 'graphql';
-import sdk from 'matrix-js-sdk';
+import { getCachedMatrixClient } from './utils';
 import Viewer from './Viewer';
 
 export default new GraphQLObjectType({
@@ -8,21 +8,20 @@ export default new GraphQLObjectType({
     viewer: {
       type: Viewer,
       args: {
-        token: {
+        accessToken: {
           type: GraphQLString,
         },
         userId: {
           type: GraphQLString,
         },
       },
-      resolve: (_, args) => ({
-        matrixClient: sdk.createClient({
-          baseUrl: 'https://13.59.234.201.xip.io',
-          // TODO: check auth data
-          accessToken: args.token,
-          userId: args.userId,
-        }),
-      }),
+      resolve: async (_, args) => {
+        const matrixClient = await getCachedMatrixClient(args);
+
+        return {
+          matrixClient,
+        };
+      },
     },
   },
 });

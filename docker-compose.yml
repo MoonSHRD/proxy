@@ -31,6 +31,7 @@ services:
       - ./src:/app/src:ro
     environment:
       - DATABASE_URL=postgres://synapse:changeme@db/synapse
+      - MATRIX_ENDPOINT=http://synapse:8008
     ports:
       - 4000:4000
     depends_on:
