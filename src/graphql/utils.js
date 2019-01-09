@@ -26,12 +26,6 @@ export const getCachedMatrixClient = async ({ accessToken, userId }) => {
       userId,
     });
 
-    try {
-      await client.startClient({ initialSyncLimit: 10 });
-    } catch (e) {
-      reject(e);
-    }
-
     const whoami = (err, data) => {
       if (err || !data || data.user_id !== userId) {
         reject(err);
@@ -47,4 +41,26 @@ export const getCachedMatrixClient = async ({ accessToken, userId }) => {
   matrixCache[accessToken] = promise;
 
   return promise;
+};
+
+export const startCachedMatrixClient = async params => {
+  const client = await getCachedMatrixClient(params);
+
+  if (!client.proxyStartCount) {
+    await client.startClient({ initialSyncLimit: 10 });
+    client.proxyStartCount = 1;
+  } else {
+    client.proxyStartCount += 1;
+  }
+
+  return client;
+};
+
+export const stopCachedMatrixClient = client => {
+  // eslint-disable-next-line no-param-reassign
+  client.proxyStartCount -= 1;
+
+  if (client.proxyStartCount === 0) {
+    client.stopClient();
+  }
 };

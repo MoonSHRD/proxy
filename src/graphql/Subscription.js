@@ -1,22 +1,8 @@
 import { GraphQLObjectType, GraphQLString, GraphQLNonNull } from 'graphql';
 import { subscriptionWithClientId } from 'graphql-relay-subscription';
-import { PubSub } from 'graphql-subscriptions';
+import { $$asyncIterator } from 'iterall';
+import { camelizeKeys } from 'humps';
 import RoomMessage from './RoomMessage';
-
-const pubsub = new PubSub();
-
-setInterval(() => {
-  pubsub.publish('newRoomMessageChannel', {
-    message: {
-      eventId: 'uniqeventid',
-      roomId: 'test',
-      content: {
-        body: 'test',
-        msgtype: 't.text',
-      },
-    },
-  });
-}, 1000);
 
 const newRoomMessage = subscriptionWithClientId({
   name: 'NewRoomMessage',
@@ -26,11 +12,33 @@ const newRoomMessage = subscriptionWithClientId({
     },
   },
   outputFields: {
-    message: {
+    event: {
       type: new GraphQLNonNull(RoomMessage),
     },
   },
-  subscribe: () => pubsub.asyncIterator('newRoomMessageChannel'),
+  subscribe: (args, context) => ({
+    next() {
+      return context.matrixClient.then(
+        client =>
+          new Promise(resolve => {
+            client.on('Room.timeline', e => {
+              if (e.getType() === 'm.room.message') {
+                resolve({ value: { event: camelizeKeys(e.event) }, done: false });
+              }
+            });
+          })
+      );
+    },
+    return() {
+      return Promise.resolve({ value: undefined, done: true });
+    },
+    throw(error) {
+      return Promise.reject(error);
+    },
+    [$$asyncIterator]() {
+      return this;
+    },
+  }),
 });
 
 export default new GraphQLObjectType({
