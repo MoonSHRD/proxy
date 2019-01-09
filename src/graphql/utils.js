@@ -1,5 +1,7 @@
 import joinMonster from 'join-monster';
 import sdk from 'matrix-js-sdk';
+import { $$asyncIterator } from 'iterall';
+import { camelizeKeys } from 'humps';
 import pgFormat from 'pg-format';
 
 export const monsterResolve = (parent, args, context, resolveInfo) =>
@@ -64,3 +66,27 @@ export const stopCachedMatrixClient = client => {
     client.stopClient();
   }
 };
+
+export const makeMatrixSubscribe = (event, filter) => (args, context) => ({
+  next() {
+    return context.matrixClient.then(
+      client =>
+        new Promise(resolve => {
+          client.on('Room.timeline', e => {
+            if (filter(e, args, context)) {
+              resolve({ value: { event: camelizeKeys(e.event) }, done: false });
+            }
+          });
+        })
+    );
+  },
+  return() {
+    return Promise.resolve({ value: undefined, done: true });
+  },
+  throw(error) {
+    return Promise.reject(error);
+  },
+  [$$asyncIterator]() {
+    return this;
+  },
+});
