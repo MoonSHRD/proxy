@@ -1,0 +1,41 @@
+version: '3'
+
+services:
+  db:
+    image: docker.io/postgres:10-alpine
+    environment:
+      - POSTGRES_USER=synapse
+      - POSTGRES_PASSWORD=changeme
+    volumes:
+    - pgdata:/var/lib/postgresql
+
+  synapse:
+    image: docker.io/matrixdotorg/synapse:v0.34.0-py3
+    environment:
+      - SYNAPSE_SERVER_NAME=localhost
+      - SYNAPSE_REPORT_STATS=no
+      - SYNAPSE_ENABLE_REGISTRATION=yes
+      - SYNAPSE_LOG_LEVEL=INFO
+      - POSTGRES_PASSWORD=changeme
+    depends_on:
+      - db
+    ports:
+      - 8008:8008
+
+  proxy:
+    build:
+      dockerfile: Dockerfile.dev
+      context: .
+    command: sh -c 'cd /app && yarn start'
+    volumes:
+      - ./src:/app/src:ro
+    environment:
+      - DATABASE_URL=postgres://synapse:changeme@db/synapse
+    ports:
+      - 4000:4000
+    depends_on:
+      - db
+      - synapse
+
+volumes:
+  pgdata:

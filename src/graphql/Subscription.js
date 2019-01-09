@@ -1,7 +1,7 @@
-import { GraphQLString, GraphQLNonNull } from 'graphql';
+import { GraphQLObjectType, GraphQLString, GraphQLNonNull } from 'graphql';
 import { subscriptionWithClientId } from 'graphql-relay-subscription';
 import { PubSub } from 'graphql-subscriptions';
-import { RoomMessage } from './types';
+import RoomMessage from './RoomMessage';
 
 const pubsub = new PubSub();
 
@@ -12,7 +12,7 @@ setInterval(() => {
       roomId: 'test',
       content: {
         body: 'test',
-        msgtype: 't.text'
+        msgtype: 't.text',
       },
     },
   });
@@ -22,7 +22,7 @@ const newRoomMessage = subscriptionWithClientId({
   name: 'NewRoomMessage',
   inputFields: {
     roomId: {
-      type: new GraphQLNonNull(GraphQLString)
+      type: new GraphQLNonNull(GraphQLString),
     },
   },
   outputFields: {
@@ -30,9 +30,12 @@ const newRoomMessage = subscriptionWithClientId({
       type: new GraphQLNonNull(RoomMessage),
     },
   },
-  subscribe: ({ roomId }) => pubsub.asyncIterator('newRoomMessageChannel'),
+  subscribe: () => pubsub.asyncIterator('newRoomMessageChannel'),
 });
 
-export default {
-  newRoomMessage,
-};
+export default new GraphQLObjectType({
+  name: 'Subscription',
+  fields: {
+    newRoomMessage,
+  },
+});
