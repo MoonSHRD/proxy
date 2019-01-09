@@ -4,6 +4,7 @@
     "start": "nodemon --exec babel-node src/index.js"
   },
   "devDependencies": {
+    "@babel/cli": "^7.2.3",
     "@babel/core": "^7.2.2",
     "@babel/node": "^7.2.2",
     "@babel/preset-env": "^7.2.3",

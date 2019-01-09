@@ -1,5 +1,7 @@
 FROM node:10.8-alpine
 WORKDIR /app
-ADD package.json yarn.lock /app/
+
+COPY package.json yarn.lock /app/
 RUN yarn
-ADD .babelrc /app
+
+COPY .babelrc /app
