@@ -1,5 +1,6 @@
 import express from 'express';
 import graphqlHTTP from 'express-graphql';
+import cors from 'cors';
 import { createServer } from 'http';
 import { execute, subscribe } from 'graphql';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
@@ -9,6 +10,10 @@ import db from './db';
 
 const app = express();
 const port = process.env.PORT || 4000;
+
+if (process.env.NODE_ENV !== 'production') {
+  app.use(cors());
+}
 
 app.use(
   '/graphql',

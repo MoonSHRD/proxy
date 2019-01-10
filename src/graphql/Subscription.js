@@ -1,4 +1,4 @@
-import { GraphQLObjectType, GraphQLString, GraphQLNonNull } from 'graphql';
+import { GraphQLObjectType, GraphQLNonNull, GraphQLID } from 'graphql';
 import { subscriptionWithClientId } from 'graphql-relay-subscription';
 import { makeMatrixSubscribe } from './utils';
 import RoomMessage from './RoomMessage';
@@ -7,7 +7,7 @@ const newRoomMessage = subscriptionWithClientId({
   name: 'NewRoomMessage',
   inputFields: {
     roomId: {
-      type: new GraphQLNonNull(GraphQLString),
+      type: new GraphQLNonNull(GraphQLID),
     },
   },
   outputFields: {
