@@ -1,7 +1,7 @@
 import { GraphQLObjectType, GraphQLNonNull, GraphQLID } from 'graphql';
 import { subscriptionWithClientId } from 'graphql-relay-subscription';
-import { makeMatrixSubscribe } from './utils';
-import RoomMessage from './RoomMessage';
+import { pubsub, withFilter } from './utils';
+import { RoomMessageEdge } from './RoomMessage';
 
 const newRoomMessage = subscriptionWithClientId({
   name: 'NewRoomMessage',
@@ -11,17 +11,14 @@ const newRoomMessage = subscriptionWithClientId({
     },
   },
   outputFields: {
-    event: {
-      type: new GraphQLNonNull(RoomMessage),
+    edge: {
+      type: new GraphQLNonNull(RoomMessageEdge),
     },
   },
-  subscribe: makeMatrixSubscribe('Room.timeline', ({ event }, args) => {
-    if (event.type !== 'm.room.message' || event.room_id !== args.roomId) {
-      return null;
-    }
-
-    return { event };
-  }),
+  subscribe: withFilter(
+    (_, context) => pubsub.asyncIterator(`room.timeline:${context.accessToken}`),
+    (payload, args) => payload.edge.node.type === 'm.room.message' && payload.edge.node.roomId === args.roomId
+  ),
 });
 
 export default new GraphQLObjectType({

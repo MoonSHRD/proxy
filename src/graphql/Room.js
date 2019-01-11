@@ -1,9 +1,8 @@
-import { GraphQLObjectType, GraphQLString, GraphQLNonNull, GraphQLList, GraphQLInt, GraphQLBoolean } from 'graphql';
-import { globalIdField } from 'graphql-relay';
+import { GraphQLObjectType, GraphQLString, GraphQLNonNull, GraphQLBoolean, GraphQLID } from 'graphql';
+import { connectionArgs, connectionFromArray } from 'graphql-relay';
 
 import { nodeInterface } from './Node';
-import RoomMessage from './RoomMessage';
-import Direction from './Direction';
+import { RoomMessageConnection } from './RoomMessage';
 
 export default new GraphQLObjectType({
   name: 'Room',
@@ -12,8 +11,8 @@ export default new GraphQLObjectType({
   interfaces: [nodeInterface],
   fields: {
     id: {
-      ...globalIdField(),
-      sqlDeps: 'room_id',
+      type: new GraphQLNonNull(GraphQLID),
+      sqlColumn: 'room_id',
     },
     isPublic: {
       type: GraphQLBoolean,
@@ -23,21 +22,10 @@ export default new GraphQLObjectType({
       type: GraphQLString,
     },
     messages: {
-      args: {
-        from: {
-          type: GraphQLString,
-        },
-        to: {
-          type: GraphQLString,
-        },
-        dir: {
-          type: Direction,
-        },
-        limit: {
-          type: GraphQLInt,
-        },
-      },
-      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(RoomMessage))),
+      args: connectionArgs,
+      type: RoomMessageConnection,
+      // TODO: load latest messages
+      resolve: (room, args) => connectionFromArray([], args),
     },
   },
 });

@@ -1,7 +1,8 @@
 import joinMonster from 'join-monster';
 import sdk from 'matrix-js-sdk';
-import { $$asyncIterator } from 'iterall';
+import { PubSub } from 'graphql-subscriptions';
 import { camelizeKeys } from 'humps';
+import { $$asyncIterator } from 'iterall';
 import pgFormat from 'pg-format';
 
 export const monsterResolve = (parent, args, context, resolveInfo) =>
@@ -15,8 +16,17 @@ export const makeAndWhere = (...fns) => (...args) =>
     .join(' and ');
 
 const matrixCache = {};
+export const pubsub = new PubSub();
 
 export const getCachedMatrixClient = async ({ accessToken, userId }) => {
+  if (!accessToken) {
+    throw new Error('accessToken not found');
+  }
+
+  if (!userId) {
+    throw new Error('userId not found');
+  }
+
   if (matrixCache[accessToken]) {
     return matrixCache[accessToken];
   }
@@ -32,6 +42,18 @@ export const getCachedMatrixClient = async ({ accessToken, userId }) => {
       if (err || !data || data.user_id !== userId) {
         reject(err);
       } else {
+        client.on('Room.timeline', e => {
+          console.log(e.event);
+          pubsub.publish(`room.timeline:${accessToken}`, {
+            edge: {
+              node: {
+                id: e.event.event_id,
+                ...camelizeKeys(e.event),
+              },
+            },
+          });
+        });
+
         resolve(client);
       }
     };
@@ -74,7 +96,7 @@ export const makeMatrixSubscribe = (event, transform = identity) => (args, conte
     return context.matrixClient.then(
       client =>
         new Promise(resolve => {
-          client.on(event, e => {
+          client.once(event, e => {
             const value = camelizeKeys(transform(e, args, context));
 
             if (value) {
@@ -94,3 +116,41 @@ export const makeMatrixSubscribe = (event, transform = identity) => (args, conte
     return this;
   },
 });
+
+export const withFilter = (asyncIteratorFn, filterFn) => (args, context, info) => {
+  const asyncIterator = asyncIteratorFn(args, context, info);
+
+  const getNextPromise = () =>
+    asyncIterator.next().then(payload => {
+      if (payload.done === true) {
+        return payload;
+      }
+
+      console.log(payload.value);
+      return Promise.resolve(filterFn(payload.value, args, context, info))
+        .catch(() => false)
+        .then(filterResult => {
+          if (filterResult === true) {
+            return payload;
+          }
+
+          // Skip the current value and wait for the next one
+          return getNextPromise();
+        });
+    });
+
+  return {
+    next() {
+      return getNextPromise();
+    },
+    return() {
+      return asyncIterator.return();
+    },
+    throw(error) {
+      return asyncIterator.throw(error);
+    },
+    [$$asyncIterator]() {
+      return this;
+    },
+  };
+};

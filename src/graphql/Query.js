@@ -15,8 +15,11 @@ export default new GraphQLObjectType({
           type: GraphQLString,
         },
       },
-      resolve: async (_, args) => {
-        const matrixClient = await getCachedMatrixClient(args);
+      resolve: async (_, args, context) => {
+        const matrixClient = await getCachedMatrixClient({
+          ...context,
+          ...args,
+        });
 
         return {
           matrixClient,

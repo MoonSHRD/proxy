@@ -1,4 +1,5 @@
 import { GraphQLObjectType, GraphQLNonNull, GraphQLID, GraphQLString } from 'graphql';
+import { connectionDefinitions } from 'graphql-relay';
 
 const MessageContent = new GraphQLObjectType({
   name: 'MessageContent',
@@ -9,7 +10,7 @@ const MessageContent = new GraphQLObjectType({
   },
 });
 
-export default new GraphQLObjectType({
+const RoomMessage = new GraphQLObjectType({
   name: 'RoomMessage',
   fields: {
     id: {
@@ -18,8 +19,18 @@ export default new GraphQLObjectType({
     roomId: {
       type: new GraphQLNonNull(GraphQLString),
     },
+    sender: {
+      type: GraphQLString,
+    },
     content: {
       type: new GraphQLNonNull(MessageContent),
     },
   },
 });
+
+const { connectionType: RoomMessageConnection, edgeType: RoomMessageEdge } = connectionDefinitions({
+  nodeType: RoomMessage,
+});
+
+export { RoomMessageConnection, RoomMessageEdge };
+export default RoomMessage;

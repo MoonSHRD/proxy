@@ -6,6 +6,10 @@ import Room from './Room';
 export default new GraphQLObjectType({
   name: 'Viewer',
   fields: {
+    id: {
+      type: new GraphQLNonNull(GraphQLID),
+      resolve: () => 'viewer',
+    },
     groupMembership: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GroupMembership))),
       resolve: monsterResolve,

@@ -15,20 +15,30 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(cors());
 }
 
+const formatError = error => {
+  console.log(error);
+
+  return {
+    message: error.message,
+    locations: error.locations,
+    stack: error.stack ? error.stack.split('\n') : [],
+    path: error.path,
+  };
+};
+
 app.use(
   '/graphql',
-  graphqlHTTP({
+  graphqlHTTP(req => ({
     schema,
     graphiql: true,
     subscriptionsEndpoint: '/subscriptions',
-    context: { db },
-    formatError: error => ({
-      message: error.message,
-      locations: error.locations,
-      stack: error.stack ? error.stack.split('\n') : [],
-      path: error.path,
-    }),
-  })
+    context: {
+      db,
+      accessToken: req.get('X-Access-Token'),
+      userId: req.get('X-User-ID'),
+    },
+    formatError,
+  }))
 );
 
 const server = createServer(app);
@@ -41,8 +51,12 @@ server.listen(port, () => {
       subscribe,
       schema,
       onConnect: (params, ws, context) => {
+        console.log('params', params);
         // eslint-disable-next-line no-param-reassign
-        context.matrixClient = startCachedMatrixClient(params);
+        context.matrixClient = startCachedMatrixClient(params).catch(e => {
+          console.error('catch matrix error', e);
+          ws.close();
+        });
 
         return {
           ...params,
@@ -50,7 +64,9 @@ server.listen(port, () => {
         };
       },
       onDisconnect: (ws, context) => {
-        context.matrixClient.then(stopCachedMatrixClient);
+        if (context.matrixClient) {
+          context.matrixClient.then(stopCachedMatrixClient);
+        }
       },
     },
     {
