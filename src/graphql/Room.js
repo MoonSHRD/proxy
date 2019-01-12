@@ -32,7 +32,7 @@ export default new GraphQLObjectType({
            where json::json->>'type' = 'm.room.message'
              and json::json->>'room_id' = ${t}.room_id
            order by (json::json->>'unsigned')::json->>'ageTs' desc
-           limit 10
+           limit 30
         ) t)
       `,
       resolve: (room, args) => connectionFromArray(room.messages.map(m => camelizeKeys(m)), args),
