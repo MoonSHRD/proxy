@@ -43,13 +43,9 @@ export const getCachedMatrixClient = async ({ accessToken, userId }) => {
         reject(err);
       } else {
         client.on('Room.timeline', e => {
-          console.log(e.event);
           pubsub.publish(`room.timeline:${accessToken}`, {
             edge: {
-              node: {
-                id: e.event.event_id,
-                ...camelizeKeys(e.event),
-              },
+              node: camelizeKeys(e.event),
             },
           });
         });
@@ -126,7 +122,6 @@ export const withFilter = (asyncIteratorFn, filterFn) => (args, context, info) =
         return payload;
       }
 
-      console.log(payload.value);
       return Promise.resolve(filterFn(payload.value, args, context, info))
         .catch(() => false)
         .then(filterResult => {

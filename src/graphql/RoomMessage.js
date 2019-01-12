@@ -15,12 +15,17 @@ const RoomMessage = new GraphQLObjectType({
   fields: {
     id: {
       type: new GraphQLNonNull(GraphQLID),
+      resolve: m => m.eventId,
     },
     roomId: {
       type: new GraphQLNonNull(GraphQLString),
     },
     sender: {
       type: GraphQLString,
+    },
+    age: {
+      type: GraphQLString,
+      resolve: m => m.unsigned.ageTs,
     },
     content: {
       type: new GraphQLNonNull(MessageContent),
