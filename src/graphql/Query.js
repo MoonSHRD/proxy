@@ -1,6 +1,8 @@
-import { GraphQLObjectType, GraphQLString } from 'graphql';
-import { getCachedMatrixClient } from './utils';
+import { GraphQLObjectType, GraphQLString, GraphQLNonNull, GraphQLID } from 'graphql';
+import pgFormat from 'pg-format';
+import { monsterResolve, getCachedMatrixClient } from './utils';
 import Viewer from './Viewer';
+import Group from './Group';
 
 export default new GraphQLObjectType({
   name: 'Query',
@@ -25,6 +27,16 @@ export default new GraphQLObjectType({
           matrixClient,
         };
       },
+    },
+    group: {
+      type: Group,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLID),
+        },
+      },
+      where: (t, args) => pgFormat(`${t}.group_id = %L`, args.id),
+      resolve: monsterResolve,
     },
   },
 });

@@ -6,7 +6,7 @@ import { $$asyncIterator } from 'iterall';
 import pgFormat from 'pg-format';
 
 export const monsterResolve = (parent, args, context, resolveInfo) =>
-  joinMonster(resolveInfo, { ...context, matrixClient: parent.matrixClient }, sql => context.db.raw(sql));
+  joinMonster(resolveInfo, { ...context, matrixClient: parent && parent.matrixClient }, sql => context.db.raw(sql));
 
 export const makeAndWhere = (...fns) => (...args) =>
   fns
