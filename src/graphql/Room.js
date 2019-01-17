@@ -26,7 +26,7 @@ export default new GraphQLObjectType({
       args: connectionArgs,
       type: RoomMessageConnection,
       sqlExpr: t => `
-        (select array_agg(t.data) from (
+        (select coalesce(array_agg(t.data), '{}') from (
           select json::json as data
             from event_json
            where json::json->>'type' = 'm.room.message'
