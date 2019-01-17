@@ -30,14 +30,14 @@ export default new GraphQLObjectType({
     messages: {
       args: connectionArgs,
       type: RoomMessageConnection,
-      sqlExpr: t => `
+      sqlExpr: (t, args) => `
         (select coalesce(array_agg(t.data), '{}') from (
           select json::json as data
             from event_json
            where json::json->>'type' = 'm.room.message'
              and json::json->>'room_id' = ${t}.room_id
            order by (json::json->>'unsigned')::json->>'ageTs' desc
-           limit 30
+           limit ${args.last || 30}
         ) t)
       `,
       resolve: (room, args) => connectionFromArray(room.messages.map(m => camelizeKeys(m)), args),
