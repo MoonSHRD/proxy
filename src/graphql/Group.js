@@ -1,5 +1,6 @@
-import { GraphQLObjectType, GraphQLNonNull, GraphQLBoolean, GraphQLString, GraphQLID } from 'graphql';
+import { GraphQLObjectType, GraphQLNonNull, GraphQLBoolean, GraphQLString, GraphQLID, GraphQLList } from 'graphql';
 import { nodeInterface } from './Node';
+import Room from './Room';
 
 export default new GraphQLObjectType({
   name: 'Group',
@@ -33,6 +34,18 @@ export default new GraphQLObjectType({
     joinPolicy: {
       type: GraphQLString,
       sqlColumn: 'join_policy',
+    },
+    rooms: {
+      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Room))),
+      junction: {
+        sqlTable: 'group_rooms',
+        uniqueKey: ['group_id', 'room_id'],
+        sqlBatch: {
+          thisKey: 'group_id',
+          parentKey: 'group_id',
+          sqlJoin: (junctionTable, roomTable) => `${junctionTable}.room_id = ${roomTable}.room_id`,
+        },
+      },
     },
   },
 });

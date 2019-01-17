@@ -22,6 +22,11 @@ export default new GraphQLObjectType({
     creator: {
       type: GraphQLString,
     },
+    name: {
+      type: GraphQLString,
+      // TODO: Why can a room have few names?
+      sqlExpr: t => `(select name from room_names rn where rn.room_id = ${t}.room_id)`,
+    },
     messages: {
       args: connectionArgs,
       type: RoomMessageConnection,
