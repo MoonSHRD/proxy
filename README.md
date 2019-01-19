@@ -17,6 +17,11 @@ Load dump:
 docker-compose exec -T db psql synapse -U synapse < synapse.sql
 ```
 
+## Test users
+
+ - name: user1 password: testtest
+ - name: user2 password: testtest
+
 ### Tips
 
 Show only proxy logs
