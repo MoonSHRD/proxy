@@ -7,6 +7,11 @@ docker-compose up --build
 
 Then open http://localhost:3000/graphiql
 
+Migrate:
+```
+docker-compose exec -T db psql synapse -U synapse < migrations.sql
+```
+
 Load dump:
 ```
 docker-compose exec -T db psql synapse -U synapse < synapse.sql

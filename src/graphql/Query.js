@@ -1,12 +1,15 @@
 import { GraphQLObjectType, GraphQLString, GraphQLNonNull, GraphQLID, GraphQLList } from 'graphql';
 import pgFormat from 'pg-format';
 import { monsterResolve, getCachedMatrixClient } from './utils';
+import { nodeField } from './Node';
 import Viewer from './Viewer';
+import User from './User';
 import Group from './Group';
 
 export default new GraphQLObjectType({
   name: 'Query',
   fields: {
+    node: nodeField,
     viewer: {
       type: Viewer,
       args: {
@@ -27,6 +30,16 @@ export default new GraphQLObjectType({
           matrixClient,
         };
       },
+    },
+    user: {
+      type: User,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLID),
+        },
+      },
+      where: (t, args) => pgFormat(`${t}.name = %L`, args.id),
+      resolve: monsterResolve,
     },
     group: {
       type: Group,

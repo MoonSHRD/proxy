@@ -11,7 +11,8 @@ const { nodeInterface, nodeField } = nodeDefinitions(
     const { type, id } = fromGlobalId(globalId);
     // helper method for getting Nodes from the DB, similar to the parent function.
     // also need to pass it the type name and a where function
-    return joinMonster.getNode(type, resolveInfo, context, parseInt(id, 10), sql => context.db.raw(sql), options);
+    // TODO: check sql injection in id
+    return joinMonster.getNode(type, resolveInfo, context, id, sql => context.db.raw(sql), options);
   },
   // this function determines the type. `joinMonster` figures it out
   // for you and attaches the type to the result in the "__type__" property
