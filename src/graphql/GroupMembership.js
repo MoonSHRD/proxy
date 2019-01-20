@@ -1,4 +1,5 @@
 import { GraphQLObjectType, GraphQLNonNull, GraphQLBoolean, GraphQLString } from 'graphql';
+import { globalIdField } from 'graphql-relay';
 import Group from './Group';
 
 export default new GraphQLObjectType({
@@ -6,11 +7,17 @@ export default new GraphQLObjectType({
   sqlTable: 'local_group_membership',
   uniqueKey: ['group_id', 'user_id'],
   fields: {
+    id: {
+      ...globalIdField(),
+      sqlDeps: ['group_id', 'user_id'],
+    },
     groupId: {
       type: new GraphQLNonNull(GraphQLString),
+      sqlColumn: 'group_id',
     },
     userId: {
       type: new GraphQLNonNull(GraphQLString),
+      sqlColumn: 'user_id',
     },
     isAdmin: {
       type: new GraphQLNonNull(GraphQLBoolean),
