@@ -47,19 +47,16 @@ const uploadContent = mutationWithClientMutationId({
       type: new GraphQLNonNull(GraphQLString),
     },
   },
-  mutateAndGetPayload: async ({ file }, ctx) => {
+  mutateAndGetPayload: async ({ file }) => {
     const opts = {
       onlyContentUri: true,
     };
 
-    console.log(ctx);
-
-    // const res = await ctx.matrixClient.uploadContent(file, opts);
-    // console.log(res);
-
-    // return res;
-    return 'asdad';
-  }
+    return {
+      file,
+      opts,
+    };
+  },
 });
 
 export default new GraphQLObjectType({
