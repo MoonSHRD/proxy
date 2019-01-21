@@ -38,5 +38,23 @@ services:
       - db
       - synapse
 
+  minio:
+    image: minio/minio
+    volumes:
+      - minio:/export
+    ports:
+      - "9000:9000"
+    environment:
+      MINIO_ACCESS_KEY: secret
+      MINIO_SECRET_KEY: secretsecret
+    command: server /export
+
+  setup_minio:
+    image: minio/mc
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: /scripts/wait-for-it.sh minio:9000 -- /scripts/setup-minio.sh
+
 volumes:
   pgdata:
+  minio:

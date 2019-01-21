@@ -1,12 +1,14 @@
 import express from 'express';
 import graphqlHTTP from 'express-graphql';
 import cors from 'cors';
+import sdk from 'matrix-js-sdk';
 import { createServer } from 'http';
 import { execute, subscribe } from 'graphql';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
 import { startCachedMatrixClient, stopCachedMatrixClient } from './graphql/utils';
 import schema from './graphql/schema';
 import db from './db';
+import minio from './minio';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -34,6 +36,12 @@ app.use(
     subscriptionsEndpoint: '/subscriptions',
     context: {
       db,
+      minio,
+      matrixClient: sdk.createClient({
+        baseUrl: process.env.MATRIX_ENDPOINT,
+        accessToken: req.get('X-Access-Token'),
+        userId: req.get('X-User-ID'),
+      }),
       accessToken: req.get('X-Access-Token'),
       userId: req.get('X-User-ID'),
     },

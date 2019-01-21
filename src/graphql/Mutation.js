@@ -1,5 +1,8 @@
 import { GraphQLObjectType, GraphQLNonNull, GraphQLID, GraphQLBoolean, GraphQLString } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
+import pgFormat from 'pg-format';
+import { monsterResolve } from './utils';
+import Group from './Group';
 
 const join = mutationWithClientMutationId({
   name: 'Join',
@@ -35,26 +38,57 @@ const leave = mutationWithClientMutationId({
   }),
 });
 
-const uploadContent = mutationWithClientMutationId({
-  name: 'UploadContent',
+const uploadGroupAvatar = mutationWithClientMutationId({
+  name: 'UploadGroupAvatar',
   inputFields: {
-    file: {
+    groupId: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    ext: {
       type: new GraphQLNonNull(GraphQLString),
     },
   },
   outputFields: {
-    contentUri: {
+    postURL: {
       type: new GraphQLNonNull(GraphQLString),
     },
+    formData: {
+      type: new GraphQLNonNull(GraphQLString),
+    },
+    group: {
+      type: new GraphQLNonNull(Group),
+      where: (t, args, context) => pgFormat(`group_id = %L`, context.groupId),
+      resolve: (parent, args, context, resolveInfo) =>
+        monsterResolve(parent, args, { ...context, groupId: parent.groupId }, resolveInfo),
+    },
   },
-  mutateAndGetPayload: async ({ file }) => {
-    const opts = {
-      onlyContentUri: true,
-    };
+  mutateAndGetPayload: async ({ groupId, ext }, context) => {
+    // TODO: check auth, check group
+
+    const objectName = `groupAvatar_${groupId.replace('+', '')}.${ext}`;
+    const policy = context.minio.newPostPolicy();
+    policy.setKey(objectName);
+    policy.setBucket('public');
+    policy.setContentLengthRange(1024, 1024 * 1024); // Min upload length is 1KB Max upload size is 1MB
+
+    const expires = new Date();
+    expires.setSeconds(600); // 10 minutes
+    policy.setExpires(expires);
+
+    const data = await context.minio.presignedPostPolicy(policy);
+    const url = `http://localhost:9000/public/${objectName}?version=${+new Date()}`;
+
+    await context
+      .db('groups')
+      .where({ group_id: groupId })
+      .update({
+        avatar_url: url,
+      });
 
     return {
-      file,
-      opts,
+      groupId,
+      postURL: 'http://localhost:9000/public',
+      formData: JSON.stringify(data.formData),
     };
   },
 });
@@ -64,6 +98,6 @@ export default new GraphQLObjectType({
   fields: {
     join,
     leave,
-    uploadContent,
+    uploadGroupAvatar,
   },
 });
