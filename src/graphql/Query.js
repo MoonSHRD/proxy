@@ -1,10 +1,12 @@
 import { GraphQLObjectType, GraphQLString, GraphQLNonNull, GraphQLID, GraphQLList } from 'graphql';
 import pgFormat from 'pg-format';
+import { forwardConnectionArgs } from 'graphql-relay';
 import { monsterResolve, getCachedMatrixClient } from './utils';
 import { nodeField } from './Node';
 import Viewer from './Viewer';
 import User from './User';
 import Group from './Group';
+import { CommunityConnection } from './Community';
 
 export default new GraphQLObjectType({
   name: 'Query',
@@ -53,6 +55,32 @@ export default new GraphQLObjectType({
     },
     groups: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Group))),
+      resolve: monsterResolve,
+    },
+    communities: {
+      type: CommunityConnection,
+      args: {
+        ...forwardConnectionArgs,
+        search: {
+          type: GraphQLString,
+        },
+      },
+      where: (t, args) => {
+        if (args.search && args.search.length > 2) {
+          return pgFormat(
+            `
+            to_tsvector('russian', ${t}.name) @@ phraseto_tsquery(%L) or
+            to_tsvector('russian', array_to_string(${t}.tags, ' ')) @@ phraseto_tsquery(%L)
+          `,
+            args.search,
+            args.search
+          );
+        }
+
+        return undefined;
+      },
+      sqlPaginate: true,
+      orderBy: 'id',
       resolve: monsterResolve,
     },
   },

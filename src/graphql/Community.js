@@ -1,5 +1,5 @@
 import { GraphQLObjectType, GraphQLNonNull, GraphQLString, GraphQLID, GraphQLList, GraphQLInt } from 'graphql';
-import { globalIdField } from 'graphql-relay';
+import { globalIdField, connectionDefinitions } from 'graphql-relay';
 
 const Community = new GraphQLObjectType({
   name: 'Community',
@@ -47,5 +47,11 @@ const Community = new GraphQLObjectType({
     },
   },
 });
+
+const { connectionType: CommunityConnection, edgeType: CommunityEdge } = connectionDefinitions({
+  nodeType: Community,
+});
+
+export { CommunityConnection, CommunityEdge };
 
 export default Community;
