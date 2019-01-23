@@ -1,4 +1,4 @@
-import { GraphQLString, GraphQLNonNull } from 'graphql';
+import { GraphQLString, GraphQLNonNull, GraphQLList, GraphQLID } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
 import { createErrorsType, createMonsterEdge } from '../utils';
 import Community from '../Community';
@@ -11,6 +11,10 @@ export default mutationWithClientMutationId({
   inputFields: {
     name: {
       type: new GraphQLNonNull(GraphQLString),
+    },
+    tags: {
+      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLID))),
+      sqlColumn: 'tags',
     },
   },
   outputFields: {
