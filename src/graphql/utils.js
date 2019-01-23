@@ -1,5 +1,7 @@
 import joinMonster from 'join-monster';
 import sdk from 'matrix-js-sdk';
+import { GraphQLString, GraphQLNonNull, GraphQLObjectType } from 'graphql';
+import { offsetToCursor } from 'graphql-relay';
 import { PubSub } from 'graphql-subscriptions';
 import { camelizeKeys } from 'humps';
 import { $$asyncIterator } from 'iterall';
@@ -152,3 +154,40 @@ export const withFilter = (asyncIteratorFn, filterFn) => (args, context, info) =
     },
   };
 };
+
+export const createErrorsType = (name, keys) => {
+  const fields = {};
+
+  keys.forEach(key => {
+    fields[key] = {
+      type: GraphQLString,
+    };
+  });
+
+  return new GraphQLObjectType({ name, fields });
+};
+
+export const createMonsterEdge = (type, primaryKey = 'id') =>
+  new GraphQLObjectType({
+    name: `Monster${type.name}Edge`,
+    description: 'An edge in a connection.',
+    fields: {
+      node: {
+        type,
+        description: 'The item at the end of the edge',
+        where: (t, args, context) => pgFormat(`${t}.${primaryKey} = %L`, context.id),
+        resolve: (parent, args, content, resolveInfo) => {
+          if (!parent.id) {
+            return null;
+          }
+
+          return monsterResolve(parent, args, { ...content, id: parent.id }, resolveInfo);
+        },
+      },
+      cursor: {
+        type: new GraphQLNonNull(GraphQLString),
+        description: 'A cursor for use in pagination',
+        resolve: () => offsetToCursor(0),
+      },
+    },
+  });

@@ -1,11 +1,11 @@
 import { GraphQLObjectType, GraphQLString, GraphQLNonNull, GraphQLBoolean, GraphQLID } from 'graphql';
-import { connectionArgs, connectionFromArray } from 'graphql-relay';
+import { connectionArgs, connectionDefinitions, connectionFromArray } from 'graphql-relay';
 import { camelizeKeys } from 'humps';
 
 import { nodeInterface } from './Node';
 import { RoomMessageConnection } from './RoomMessage';
 
-export default new GraphQLObjectType({
+const Room = new GraphQLObjectType({
   name: 'Room',
   sqlTable: 'rooms',
   uniqueKey: 'room_id',
@@ -54,3 +54,11 @@ export default new GraphQLObjectType({
     },
   },
 });
+
+const { connectionType: RoomConnection, edgeType: RoomEdge } = connectionDefinitions({
+  nodeType: Room,
+});
+
+export { RoomConnection, RoomEdge };
+
+export default Room;

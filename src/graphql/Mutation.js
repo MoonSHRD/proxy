@@ -4,6 +4,9 @@ import pgFormat from 'pg-format';
 import { monsterResolve } from './utils';
 import Group from './Group';
 
+import createCommunity from './mutations/createCommunity';
+import createRoom from './mutations/createRoom';
+
 const join = mutationWithClientMutationId({
   name: 'Join',
   inputFields: {
@@ -99,5 +102,7 @@ export default new GraphQLObjectType({
     join,
     leave,
     uploadGroupAvatar,
+    createCommunity,
+    createRoom,
   },
 });

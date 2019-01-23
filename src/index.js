@@ -9,6 +9,7 @@ import { startCachedMatrixClient, stopCachedMatrixClient } from './graphql/utils
 import schema from './graphql/schema';
 import db from './db';
 import minio from './minio';
+import { whoami } from './matrix';
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -30,23 +31,32 @@ const formatError = error => {
 
 app.use(
   '/graphql',
-  graphqlHTTP(req => ({
-    schema,
-    graphiql: true,
-    subscriptionsEndpoint: '/subscriptions',
-    context: {
-      db,
-      minio,
-      matrixClient: sdk.createClient({
-        baseUrl: process.env.MATRIX_ENDPOINT,
-        accessToken: req.get('X-Access-Token'),
-        userId: req.get('X-User-ID'),
-      }),
-      accessToken: req.get('X-Access-Token'),
-      userId: req.get('X-User-ID'),
-    },
-    formatError,
-  }))
+  graphqlHTTP(async req => {
+    const accessToken = req.get('X-Access-Token') || req.query.accessToken;
+    let userId = null;
+
+    if (accessToken) {
+      userId = await whoami(accessToken);
+    }
+
+    return {
+      schema,
+      graphiql: true,
+      subscriptionsEndpoint: '/subscriptions',
+      context: {
+        db,
+        minio,
+        userId,
+        matrixClient: sdk.createClient({
+          baseUrl: process.env.MATRIX_ENDPOINT,
+          accessToken,
+          userId,
+        }),
+        accessToken,
+      },
+      formatError,
+    };
+  })
 );
 
 const server = createServer(app);

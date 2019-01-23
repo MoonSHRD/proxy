@@ -8,7 +8,7 @@ export default new GraphQLObjectType({
   fields: {
     id: {
       type: new GraphQLNonNull(GraphQLID),
-      resolve: () => 'viewer',
+      resolve: (parent, args, context) => context.userId,
     },
     groupMembership: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GroupMembership))),

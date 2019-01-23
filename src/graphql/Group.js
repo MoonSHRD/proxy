@@ -1,8 +1,9 @@
 import { GraphQLObjectType, GraphQLNonNull, GraphQLBoolean, GraphQLString, GraphQLID, GraphQLList } from 'graphql';
+import { connectionDefinitions } from 'graphql-relay';
 import { nodeInterface } from './Node';
 import Room from './Room';
 
-export default new GraphQLObjectType({
+const Group = new GraphQLObjectType({
   name: 'Group',
   sqlTable: 'groups',
   uniqueKey: 'group_id',
@@ -49,3 +50,10 @@ export default new GraphQLObjectType({
     },
   },
 });
+
+const { connectionType: GroupConnection, edgeType: GroupEdge } = connectionDefinitions({
+  nodeType: Group,
+});
+
+export { GroupConnection, GroupEdge };
+export default Group;
