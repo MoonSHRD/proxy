@@ -1,5 +1,6 @@
 import { GraphQLObjectType, GraphQLNonNull, GraphQLString, GraphQLID, GraphQLList, GraphQLInt } from 'graphql';
-import { globalIdField, connectionDefinitions } from 'graphql-relay';
+import { globalIdField, connectionDefinitions, connectionArgs } from 'graphql-relay';
+import { RoomConnection } from './Room';
 
 const Community = new GraphQLObjectType({
   name: 'Community',
@@ -44,6 +45,13 @@ const Community = new GraphQLObjectType({
     generalRoomId: {
       type: new GraphQLNonNull(GraphQLID),
       sqlColumn: 'general_room_id',
+    },
+    rooms: {
+      type: RoomConnection,
+      args: connectionArgs,
+      sqlPaginate: true,
+      orderBy: 'room_id',
+      sqlJoin: (t, roomTable) => `${roomTable}.room_id = any (${t}.room_ids)`,
     },
   },
 });

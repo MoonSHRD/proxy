@@ -1,4 +1,4 @@
-import { GraphQLObjectType, GraphQLString, GraphQLNonNull, GraphQLID, GraphQLList } from 'graphql';
+import { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLNonNull, GraphQLID, GraphQLList } from 'graphql';
 import pgFormat from 'pg-format';
 import { forwardConnectionArgs } from 'graphql-relay';
 import { monsterResolve, getCachedMatrixClient } from './utils';
@@ -6,7 +6,7 @@ import { nodeField } from './Node';
 import Viewer from './Viewer';
 import User from './User';
 import Group from './Group';
-import { CommunityConnection } from './Community';
+import Community, { CommunityConnection } from './Community';
 
 export default new GraphQLObjectType({
   name: 'Query',
@@ -55,6 +55,16 @@ export default new GraphQLObjectType({
     },
     groups: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Group))),
+      resolve: monsterResolve,
+    },
+    community: {
+      type: Community,
+      args: {
+        rowId: {
+          type: new GraphQLNonNull(GraphQLInt),
+        },
+      },
+      where: (t, args) => `${t}.id = ${args.rowId}`,
       resolve: monsterResolve,
     },
     communities: {

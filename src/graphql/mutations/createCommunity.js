@@ -3,7 +3,7 @@ import { mutationWithClientMutationId } from 'graphql-relay';
 import { createErrorsType, createMonsterEdge } from '../utils';
 import Community from '../Community';
 
-const CreateCommunityErrors = createErrorsType('CreateCommunity', ['common']);
+const CreateCommunityErrors = createErrorsType('CreateCommunity', ['common', 'name']);
 const CreatedCommunityEdge = createMonsterEdge(Community);
 
 export default mutationWithClientMutationId({
