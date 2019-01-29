@@ -26,6 +26,7 @@ export default mutationWithClientMutationId({
     },
   },
   mutateAndGetPayload: async (args, context) => {
+    console.log('start');
     if (!context.userId) {
       return {
         errors: {
@@ -34,20 +35,28 @@ export default mutationWithClientMutationId({
       };
     }
 
-    const { room_id: roomId } = await context.matrixClient.createRoom({
-      name: 'general',
-    });
+    try {
+      const { room_id: roomId } = await context.matrixClient.createRoom({
+        name: 'general',
+      });
 
-    const data = {
-      ...args,
-      owner_id: context.userId,
-      general_room_id: roomId,
-      room_ids: [roomId],
-    };
+      const data = {
+        ...args,
+        owner_id: context.userId,
+        general_room_id: roomId,
+        room_ids: [roomId],
+      };
 
-    const [edge] = await context.db('communities').insert(data, ['id']);
+      const [edge] = await context.db('communities').insert(data, ['id']);
 
-    // pass id to resolve edge
-    return { edge };
+      // pass id to resolve edge
+      return { edge };
+    } catch (e) {
+      return {
+        errors: {
+          common: e.message,
+        },
+      };
+    }
   },
 });

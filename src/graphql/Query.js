@@ -93,5 +93,14 @@ export default new GraphQLObjectType({
       orderBy: 'id',
       resolve: monsterResolve,
     },
+    allCommunityTags: {
+      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))),
+      resolve: async (obj, args, { db }) => {
+        const { rows } = await db.raw(`
+        `);
+
+        return rows[0].tags;
+      },
+    },
   },
 });

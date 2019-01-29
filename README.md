@@ -12,9 +12,9 @@ Migrate:
 docker-compose exec -T db psql synapse -U synapse < migrations.sql
 ```
 
-Load dump:
+Load example data:
 ```
-docker-compose exec -T db psql synapse -U synapse < synapse.sql
+docker-compose exec -T db psql synapse -U synapse < seed.sql
 ```
 
 ## Test users
