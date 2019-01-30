@@ -5,7 +5,7 @@ COPY package.json yarn.lock /app/
 RUN yarn
 
 COPY . /app/
-RUN ls && yarn babel src --out-dir lib
+RUN yarn babel src --out-dir lib
 
 FROM node:10.8-alpine
 
@@ -14,7 +14,7 @@ ENTRYPOINT ["/sbin/tini", "--"]
 
 WORKDIR /app
 
-ADD package.json yarn.lock /app/
+COPY package.json yarn.lock /app/
 RUN yarn --production
 COPY --from=build /app/lib /app/src
 
