@@ -18,4 +18,6 @@ COPY package.json yarn.lock /app/
 RUN yarn --production
 COPY --from=build /app/lib /app/src
 
+EXPOSE 4000
+
 CMD ["node", "/app/src/index.js"]
