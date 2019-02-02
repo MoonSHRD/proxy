@@ -22,13 +22,17 @@ export default new GraphQLObjectType({
           type: GraphQLString,
         },
       },
-      resolve: async (_, args, context) => {
+      where: (t, args, context) => pgFormat(`${t}.name = %L`, context.userId),
+      resolve: async (parent, args, context, resolveInfo) => {
         const matrixClient = await getCachedMatrixClient({
           ...context,
           ...args,
         });
 
+        const viewer = await monsterResolve(parent, args, context, resolveInfo);
+
         return {
+          ...viewer,
           matrixClient,
         };
       },

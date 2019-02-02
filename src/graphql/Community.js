@@ -1,12 +1,13 @@
 import { GraphQLObjectType, GraphQLNonNull, GraphQLString, GraphQLID, GraphQLList, GraphQLInt } from 'graphql';
 import { globalIdField, connectionDefinitions, connectionArgs } from 'graphql-relay';
 import { RoomConnection } from './Room';
+import { CommunityUserConnection } from './CommunityUser';
 
 const Community = new GraphQLObjectType({
   name: 'Community',
   sqlTable: 'communities',
   uniqueKey: 'id',
-  fields: {
+  fields: () => ({
     id: {
       ...globalIdField(),
       sqlDeps: ['id'],
@@ -53,7 +54,14 @@ const Community = new GraphQLObjectType({
       orderBy: 'room_id',
       sqlJoin: (t, roomTable) => `${roomTable}.room_id = any (${t}.room_ids)`,
     },
-  },
+    communityUsers: {
+      type: CommunityUserConnection,
+      args: connectionArgs,
+      sqlPaginate: true,
+      orderBy: 'created_at',
+      sqlJoin: (t, communityUserTable) => `${t}.id = ${communityUserTable}.community_id`,
+    },
+  }),
 });
 
 const { connectionType: CommunityConnection, edgeType: CommunityEdge } = connectionDefinitions({

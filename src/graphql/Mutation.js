@@ -1,4 +1,4 @@
-import { GraphQLObjectType, GraphQLNonNull, GraphQLID, GraphQLBoolean, GraphQLString } from 'graphql';
+import { GraphQLObjectType, GraphQLNonNull, GraphQLString } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
 import pgFormat from 'pg-format';
 import { monsterResolve } from './utils';
@@ -6,40 +6,8 @@ import Group from './Group';
 
 import createCommunity from './mutations/createCommunity';
 import createRoom from './mutations/createRoom';
-
-const join = mutationWithClientMutationId({
-  name: 'Join',
-  inputFields: {
-    groupId: {
-      type: new GraphQLNonNull(GraphQLID),
-    },
-  },
-  outputFields: {
-    success: {
-      type: new GraphQLNonNull(GraphQLBoolean),
-    },
-  },
-  mutateAndGetPayload: (/* args, context */) => ({
-    success: true,
-  }),
-});
-
-const leave = mutationWithClientMutationId({
-  name: 'Leave',
-  inputFields: {
-    groupId: {
-      type: new GraphQLNonNull(GraphQLID),
-    },
-  },
-  outputFields: {
-    success: {
-      type: new GraphQLNonNull(GraphQLBoolean),
-    },
-  },
-  mutateAndGetPayload: (/* args, context */) => ({
-    success: true,
-  }),
-});
+import joinCommunity from './mutations/joinCommunity';
+import leaveCommunity from './mutations/leaveCommunity';
 
 const uploadGroupAvatar = mutationWithClientMutationId({
   name: 'UploadGroupAvatar',
@@ -99,10 +67,10 @@ const uploadGroupAvatar = mutationWithClientMutationId({
 export default new GraphQLObjectType({
   name: 'Mutation',
   fields: {
-    join,
-    leave,
     uploadGroupAvatar,
     createCommunity,
+    joinCommunity,
+    leaveCommunity,
     createRoom,
   },
 });

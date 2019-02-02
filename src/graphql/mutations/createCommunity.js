@@ -26,7 +26,6 @@ export default mutationWithClientMutationId({
     },
   },
   mutateAndGetPayload: async (args, context) => {
-    console.log('start');
     if (!context.userId) {
       return {
         errors: {
