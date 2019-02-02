@@ -1,6 +1,6 @@
 import { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLNonNull, GraphQLID, GraphQLList } from 'graphql';
 import pgFormat from 'pg-format';
-import { forwardConnectionArgs } from 'graphql-relay';
+import { forwardConnectionArgs, fromGlobalId } from 'graphql-relay';
 import { monsterResolve, getCachedMatrixClient } from './utils';
 import { nodeField } from './Node';
 import Viewer from './Viewer';
@@ -60,11 +60,28 @@ export default new GraphQLObjectType({
     community: {
       type: Community,
       args: {
+        id: {
+          type: GraphQLID,
+        },
         rowId: {
-          type: new GraphQLNonNull(GraphQLInt),
+          type: GraphQLInt,
         },
       },
-      where: (t, args) => `${t}.id = ${args.rowId}`,
+      where: (t, args) => {
+        if (args.id) {
+          const { type, id } = fromGlobalId(args.id);
+
+          if (type === 'Community') {
+            return `${t}.id = ${id}`;
+          }
+        }
+
+        if (args.rowId) {
+          return `${t}.id = ${args.rowId}`;
+        }
+
+        return `1 != 1`;
+      },
       resolve: monsterResolve,
     },
     communities: {
@@ -96,6 +113,7 @@ export default new GraphQLObjectType({
     allCommunityTags: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLString))),
       resolve: async (obj, args, { db }) => {
+        // TODO: add code
         const { rows } = await db.raw(`
         `);
 
