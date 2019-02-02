@@ -13,6 +13,6 @@ $154792481813sscwS:localhost	!YvivtdTtsTAmNnsRUw:localhost	public
 $154792488222ZBqEn:localhost	!lxLGrxbEpguUZULoSC:localhost	public
 \.
 
-insert into public.communities (owner_id, name, general_room_id) values
+insert into public.communities (owner_id, name, general_room_id, room_ids) values
 ('@user1:localhost', 'first', '!YvivtdTtsTAmNnsRUw:localhost', '{!YvivtdTtsTAmNnsRUw:localhost}'),
 ('@user1:localhost', 'second', '!DwnsPKUkFrUbPENRUr:localhost', '{!DwnsPKUkFrUbPENRUr:localhost}');
