@@ -1,7 +1,8 @@
 import { GraphQLObjectType, GraphQLNonNull, GraphQLString, GraphQLList } from 'graphql';
-import { globalIdField } from 'graphql-relay';
+import { globalIdField, forwardConnectionArgs } from 'graphql-relay';
 import { nodeInterface } from './Node';
 import Group from './Group';
+import { CommunityConnection } from './Community';
 
 export default new GraphQLObjectType({
   name: 'User',
@@ -15,6 +16,15 @@ export default new GraphQLObjectType({
     },
     name: {
       type: new GraphQLNonNull(GraphQLString),
+    },
+    ownCommunities: {
+      type: CommunityConnection,
+      args: forwardConnectionArgs,
+      sqlPaginate: true,
+      orderBy: {
+        id: 'desc',
+      },
+      sqlJoin: (t, communityTable) => `${t}.name = ${communityTable}.owner_id`,
     },
     ownGroups: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(Group))),

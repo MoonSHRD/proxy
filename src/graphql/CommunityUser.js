@@ -1,5 +1,5 @@
-import { GraphQLObjectType, GraphQLString, GraphQLNonNull } from 'graphql';
-import { globalIdField, connectionDefinitions } from 'graphql-relay';
+import { GraphQLObjectType, GraphQLString, GraphQLNonNull, GraphQLID } from 'graphql';
+import { globalIdField, connectionDefinitions, toGlobalId } from 'graphql-relay';
 import Community from './Community';
 import User from './User';
 
@@ -11,6 +11,16 @@ const CommunityUser = new GraphQLObjectType({
     id: {
       ...globalIdField(),
       sqlDeps: ['id'],
+    },
+    communityId: {
+      type: new GraphQLNonNull(GraphQLID),
+      sqlDeps: ['community_id'],
+      resolve: row => toGlobalId('Community', row.community_id),
+    },
+    userId: {
+      type: new GraphQLNonNull(GraphQLID),
+      sqlDeps: ['user_id'],
+      resolve: row => toGlobalId('User', row.user_id),
     },
     community: {
       type: new GraphQLNonNull(Community),
