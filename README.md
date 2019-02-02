@@ -33,3 +33,31 @@ Psql:
 ```
 docker-compose exec db psql synapse -U synapse
 ```
+
+### GraphQL
+
+Join & Leave mutations:
+```
+mutation {
+  joinCommunity(input: { communityId: "Q29tbXVuaXR5OjE=" }) {
+    userEdge {
+      node {
+        id
+      }
+    }
+    errors {
+      common
+      communityId
+    }
+  }
+
+  leaveCommunity(input: { communityId: "Q29tbXVuaXR5OjE=" }) {
+    deletedId
+
+    errors {
+      common
+      communityId
+    }
+  }
+}
+```
