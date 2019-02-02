@@ -1,12 +1,13 @@
 import { GraphQLObjectType, GraphQLInt, GraphQLString, GraphQLNonNull, GraphQLID, GraphQLList } from 'graphql';
 import pgFormat from 'pg-format';
 import { forwardConnectionArgs, fromGlobalId } from 'graphql-relay';
-import { monsterResolve, getCachedMatrixClient } from './utils';
+import { monsterResolve, getCachedMatrixClient, makeAndWhere } from './utils';
 import { nodeField } from './Node';
 import Viewer from './Viewer';
 import User from './User';
 import Group from './Group';
 import Community, { CommunityConnection } from './Community';
+import Room from './Room';
 
 export default new GraphQLObjectType({
   name: 'Query',
@@ -46,6 +47,19 @@ export default new GraphQLObjectType({
       },
       where: (t, args) => pgFormat(`${t}.name = %L`, args.id),
       resolve: monsterResolve,
+    },
+    room: {
+      type: Room,
+      resolve: monsterResolve,
+      args: {
+        id: {
+          type: new GraphQLNonNull(GraphQLID),
+        },
+      },
+      where: makeAndWhere(
+        // TODO: check access
+        (t, args) => [`${t}.room_id = %L`, args.id]
+      ),
     },
     group: {
       type: Group,

@@ -3,7 +3,6 @@ import { connectionArgs, toGlobalId } from 'graphql-relay';
 import { monsterResolve, makeAndWhere } from './utils';
 import GroupMembership from './GroupMembership';
 import { CommunityUserConnection } from './CommunityUser';
-import Room from './Room';
 
 export default new GraphQLObjectType({
   name: 'Viewer',
@@ -55,19 +54,6 @@ export default new GraphQLObjectType({
         thisKey: 'user_id',
         parentKey: 'name',
       },
-    },
-    room: {
-      type: Room,
-      resolve: monsterResolve,
-      args: {
-        id: {
-          type: new GraphQLNonNull(GraphQLID),
-        },
-      },
-      where: makeAndWhere(
-        // TODO: check access
-        (t, args) => [`${t}.room_id = %L`, args.id]
-      ),
     },
   }),
 });
