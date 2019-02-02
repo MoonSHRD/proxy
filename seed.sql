@@ -3,6 +3,11 @@ COPY public.users (name, password_hash, creation_ts, admin, upgrade_ts, is_guest
 @user2:localhost	$2b$12$mCZ8BbTs4L/hsfl5/lBH0.rgeq4h8sY7xL8t/loFj1xpREQOVLR4u	1547924929	0	\N	0	\N	\N	\N
 \.
 
+COPY public.profiles (user_id, displayname, avatar_url) FROM stdin;
+user1	user1	\N
+user2	user2	\N
+\.
+
 COPY public.rooms (room_id, is_public, creator) FROM stdin;
 !YvivtdTtsTAmNnsRUw:localhost	f	@user1:localhost
 !DwnsPKUkFrUbPENRUr:localhost	f	@user1:localhost
