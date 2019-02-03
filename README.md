@@ -12,16 +12,6 @@ Migrate:
 docker-compose exec -T db psql synapse -U synapse < migrations.sql
 ```
 
-Load example data:
-```
-docker-compose exec -T db psql synapse -U synapse < seed.sql
-```
-
-## Test users
-
- - name: user1 password: testtest
- - name: user2 password: testtest
-
 ### Tips
 
 Show only proxy logs
