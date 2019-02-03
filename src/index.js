@@ -2,6 +2,7 @@ import express from 'express';
 import graphqlHTTP from 'express-graphql';
 import cors from 'cors';
 import sdk from 'matrix-js-sdk';
+import proxy from 'express-http-proxy';
 import { createServer } from 'http';
 import { execute, subscribe } from 'graphql';
 import { SubscriptionServer } from 'subscriptions-transport-ws';
@@ -56,6 +57,13 @@ app.use(
       },
       formatError,
     };
+  })
+);
+
+app.use(
+  '/_matrix',
+  proxy(process.env.MATRIX_ENDPOINT, {
+    proxyReqPathResolver: req => `/_matrix${req.url}`,
   })
 );
 

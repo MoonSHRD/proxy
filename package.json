@@ -36,6 +36,7 @@
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "express-graphql": "^0.7.1",
+    "express-http-proxy": "^1.5.1",
     "graphql": "0.13.2",
     "graphql-relay": "^0.5.5",
     "graphql-relay-subscription": "^0.2.0",

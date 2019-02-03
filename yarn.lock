@@ -1422,6 +1422,11 @@ es6-error@^2.0.2:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/es6-error/-/es6-error-2.1.1.tgz#91384301ec5ed1c9a7247d1128247216f03547cd"
 
+es6-promise@^4.1.1:
+  version "4.2.5"
+  resolved "https://registry.yarnpkg.com/es6-promise/-/es6-promise-4.2.5.tgz#da6d0d5692efb461e082c14817fe2427d8f5d054"
+  integrity sha512-n6wvpdE43VFtJq+lUDYDBFUwV8TZbuGXLV4D6wKafg13ldznKsyEvatubnmUe31zcvelSzOHF+XbaT+Bl9ObDg==
+
 escape-html@~1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/escape-html/-/escape-html-1.0.3.tgz#0258eae4d3d0c0974de1c169188ef0051d1d1988"
@@ -1647,6 +1652,15 @@ express-graphql@^0.7.1:
     content-type "^1.0.4"
     http-errors "^1.7.1"
     raw-body "^2.3.3"
+
+express-http-proxy@^1.5.1:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/express-http-proxy/-/express-http-proxy-1.5.1.tgz#cbf45695c759693c9c5f946117462d25b57e77a8"
+  integrity sha512-k1RdysZWZ8wdPnsLa4iyrrYyUFih/sYKkn6WfkU/q5A8eUdh3l+oXhrRuQmEYEsZmiexVvpiOCkogl03jYfcbg==
+  dependencies:
+    debug "^3.0.1"
+    es6-promise "^4.1.1"
+    raw-body "^2.3.0"
 
 express@^4.16.4:
   version "4.16.4"
@@ -3655,7 +3669,7 @@ range-parser@~1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.0.tgz#f49be6b487894ddc40dcc94a322f611092e00d5e"
 
-raw-body@2.3.3, raw-body@^2.3.3:
+raw-body@2.3.3, raw-body@^2.3.0, raw-body@^2.3.3:
   version "2.3.3"
   resolved "https://registry.yarnpkg.com/raw-body/-/raw-body-2.3.3.tgz#1b324ece6b5706e153855bc1148c65bb7f6ea0c3"
   dependencies:
