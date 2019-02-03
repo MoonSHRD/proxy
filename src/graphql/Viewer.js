@@ -26,6 +26,16 @@ export default new GraphQLObjectType({
         (t, args) => args.isAdmin && [`${t}.is_admin`]
       ),
     },
+    ownCommunityIds: {
+      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLID))),
+      resolve: async (parent, args, context) => {
+        const ids = await context
+          .db('communities')
+          .where({ owner_id: parent.name })
+          .pluck('id');
+        return ids.map(id => toGlobalId('Community', id));
+      },
+    },
     joinedCommunityIds: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLID))),
       resolve: async (parent, args, context) => {
