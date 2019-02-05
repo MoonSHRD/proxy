@@ -51,6 +51,7 @@
     "pg": "^7.7.1",
     "pg-format": "^1.0.4",
     "query-string": "^6.2.0",
-    "subscriptions-transport-ws": "^0.9.15"
+    "subscriptions-transport-ws": "^0.9.15",
+    "uuid": "^3.3.2"
   }
 }

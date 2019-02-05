@@ -27,3 +27,14 @@ select id, community_id, user_id, created_at
  where false;
 
 create unique index if not exists community_users_uniq on community_users (community_id, user_id);
+
+create table if not exists user_files (
+  object_name text primary key,
+  owner_id text not null references users (name),
+  created_at timestamptz not null default statement_timestamp(),
+  file_size int
+);
+
+select object_name, owner_id, created_at, file_size
+  from user_files
+ where false;

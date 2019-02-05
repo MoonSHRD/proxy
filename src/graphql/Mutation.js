@@ -8,6 +8,7 @@ import createCommunity from './mutations/createCommunity';
 import createRoom from './mutations/createRoom';
 import joinCommunity from './mutations/joinCommunity';
 import leaveCommunity from './mutations/leaveCommunity';
+import uploadFile from './mutations/uploadFile';
 
 const uploadGroupAvatar = mutationWithClientMutationId({
   name: 'UploadGroupAvatar',
@@ -72,5 +73,6 @@ export default new GraphQLObjectType({
     joinCommunity,
     leaveCommunity,
     createRoom,
+    uploadFile,
   },
 });
