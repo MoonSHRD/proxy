@@ -2,6 +2,7 @@ import { GraphQLObjectType, GraphQLNonNull, GraphQLString, GraphQLID, GraphQLLis
 import { globalIdField, connectionDefinitions, connectionArgs } from 'graphql-relay';
 import { RoomConnection } from './Room';
 import { CommunityUserConnection } from './CommunityUser';
+import { createMonsterEdge } from './utils';
 
 const Community = new GraphQLObjectType({
   name: 'Community',
@@ -64,10 +65,12 @@ const Community = new GraphQLObjectType({
   }),
 });
 
+const MonsterCommunityEdge = createMonsterEdge(Community);
+
 const { connectionType: CommunityConnection, edgeType: CommunityEdge } = connectionDefinitions({
   nodeType: Community,
 });
 
-export { CommunityConnection, CommunityEdge };
+export { CommunityConnection, CommunityEdge, MonsterCommunityEdge };
 
 export default Community;

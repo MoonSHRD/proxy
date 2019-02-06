@@ -1,19 +1,25 @@
 import { GraphQLString, GraphQLNonNull, GraphQLList, GraphQLID } from 'graphql';
-import { mutationWithClientMutationId } from 'graphql-relay';
+import { mutationWithClientMutationId, fromGlobalId } from 'graphql-relay';
 import { createErrorsType } from '../utils';
 import { MonsterCommunityEdge } from '../Community';
 
-const CreateCommunityErrors = createErrorsType('CreateCommunity', ['common', 'name']);
+const UpdateCommunityErrors = createErrorsType('UpdateCommunity', ['common', 'name']);
 
 export default mutationWithClientMutationId({
-  name: 'CreateCommunity',
+  name: 'UpdateCommunity',
   inputFields: {
+    id: {
+      type: new GraphQLNonNull(GraphQLID),
+    },
     name: {
-      type: new GraphQLNonNull(GraphQLString),
+      type: GraphQLString,
     },
     tags: {
-      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(GraphQLID))),
+      type: new GraphQLList(new GraphQLNonNull(GraphQLID)),
       sqlColumn: 'tags',
+    },
+    avatar: {
+      type: GraphQLString,
     },
   },
   outputFields: {
@@ -21,7 +27,7 @@ export default mutationWithClientMutationId({
       type: MonsterCommunityEdge,
     },
     errors: {
-      type: CreateCommunityErrors,
+      type: UpdateCommunityErrors,
     },
   },
   mutateAndGetPayload: async (args, context) => {
@@ -34,20 +40,24 @@ export default mutationWithClientMutationId({
     }
 
     try {
-      const { room_id: roomId } = await context.matrixClient.createRoom({
-        name: 'general',
-      });
+      const { type, id } = fromGlobalId(args.id);
+
+      if (type !== 'Community') {
+        return {
+          errors: {
+            id: 'invalid type',
+          },
+        };
+      }
 
       const data = {
-        ...args,
-        owner_id: context.userId,
-        general_room_id: roomId,
-        room_ids: [roomId],
+        ...args
       };
 
-      const [edge] = await context.db('communities').insert(data, ['id']);
+      delete data.id;
 
-      // pass id to resolve edge
+      const [edge] = await context.db('communities').where({ id }).update(data, ['id']);
+
       return { edge };
     } catch (e) {
       return {
