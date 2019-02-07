@@ -1,10 +1,9 @@
 import { GraphQLString, GraphQLNonNull, GraphQLList, GraphQLID } from 'graphql';
 import { mutationWithClientMutationId } from 'graphql-relay';
-import { createErrorsType, createMonsterEdge } from '../utils';
-import Community from '../Community';
+import { createErrorsType } from '../utils';
+import { MonsterCommunityEdge } from '../Community';
 
 const CreateCommunityErrors = createErrorsType('CreateCommunity', ['common', 'name']);
-const CreatedCommunityEdge = createMonsterEdge(Community);
 
 export default mutationWithClientMutationId({
   name: 'CreateCommunity',
@@ -19,7 +18,7 @@ export default mutationWithClientMutationId({
   },
   outputFields: {
     edge: {
-      type: CreatedCommunityEdge,
+      type: MonsterCommunityEdge,
     },
     errors: {
       type: CreateCommunityErrors,

@@ -63,7 +63,8 @@ export default mutationWithClientMutationId({
 
       return {
         policy: {
-          url: `${presignedPolicy.postURL}/${data.object_name}`,
+          url: presignedPolicy.postURL,
+          // url: 'http://localhost:9000/public',
           data: JSON.stringify(presignedPolicy.formData),
         },
       };
