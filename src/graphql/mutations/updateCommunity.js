@@ -18,7 +18,7 @@ export default mutationWithClientMutationId({
       type: new GraphQLList(new GraphQLNonNull(GraphQLID)),
       sqlColumn: 'tags',
     },
-    avatar: {
+    avatarUrl: {
       type: GraphQLString,
     },
   },
@@ -51,10 +51,12 @@ export default mutationWithClientMutationId({
       }
 
       const data = {
-        ...args
+        ...args,
+        avatar_url: args.avatarUrl
       };
 
       delete data.id;
+      delete data.avatarUrl;
 
       const [edge] = await context.db('communities').where({ id }).update(data, ['id']);
 
