@@ -63,8 +63,7 @@ export default mutationWithClientMutationId({
 
       return {
         policy: {
-          url: presignedPolicy.postURL,
-          // url: 'http://localhost:9000/public',
+          url: `${process.env.PUBLIC_MINIO_ENDPOINT}/public`,
           data: JSON.stringify(presignedPolicy.formData),
         },
       };

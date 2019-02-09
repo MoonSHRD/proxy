@@ -32,6 +32,7 @@ services:
     environment:
       - DATABASE_URL=postgres://synapse:changeme@db/synapse
       - MATRIX_ENDPOINT=http://synapse:8008
+      - PUBLIC_MINIO_ENDPOINT=http://localhost:9000
     ports:
       - 4000:4000
     depends_on:
