@@ -84,6 +84,9 @@ export default new GraphQLObjectType({
         rowId: {
           type: GraphQLInt,
         },
+        roomId: {
+          type: GraphQLString,
+        },
       },
       where: (t, args) => {
         if (args.id) {
@@ -92,6 +95,10 @@ export default new GraphQLObjectType({
           if (type === 'Community') {
             return `${t}.id = ${id}`;
           }
+        }
+
+        if (args.roomId) {
+          return pgFormat(`%L = any (${t}.room_ids)`, args.roomId);
         }
 
         if (args.rowId) {
